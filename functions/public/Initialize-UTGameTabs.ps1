@@ -206,6 +206,44 @@ function Update-UTBenchBox {
     $sync.BenchBox.Text = ($lines -join "`r`n")
 }
 
+function Update-UTFpsDoctorPanel {
+    $panel = $sync.FpsDoctorPanel
+    $panel.Children.Clear()
+    $rows = @($sync.fpsDoctor)
+    if ($rows.Count -eq 0 -or $null -eq $rows[0]) { [void]$panel.Children.Add((New-UTTextBlock -Text 'the check did not return anything, see the log' -StyleKey 'Dim')); return }
+    $colors = @{ fix = '#F14C4C'; warn = '#DCDCAA'; info = '#9CDCFE'; ok = '#4EC9B0' }
+    $tags = @{ fix = 'FIX'; warn = 'CHECK'; info = 'INFO'; ok = 'OK' }
+    $i = 0
+    foreach ($r in @($rows | Where-Object { $_.Severity -ne 'ok' })) {
+        # Each finding is its own block so the list can cascade in, worst first.
+        $block = New-Object System.Windows.Controls.StackPanel
+        [void]$panel.Children.Add($block)
+        Start-UTFadeIn -Element $block -Offset 6 -DelayMs ([math]::Min(45 * $i, 600))
+        $i++
+        $title = ('{0}  {1}: {2}' -f $tags[$r.Severity], $r.Area, $r.Title)
+        if ($r.Impact) { $title += ('   (impact: {0})' -f $r.Impact) }
+        $tb = New-UTTextBlock -Text $title -StyleKey 'Body' -Color $colors[$r.Severity]
+        $tb.Margin = '8,6,8,0'
+        $tb.TextWrapping = 'Wrap'
+        [void]$block.Children.Add($tb)
+        foreach ($line in @($r.Detail, $(if ($r.Action) { 'fix: ' + $r.Action } else { '' }))) {
+            if (-not $line) { continue }
+            $d = New-UTTextBlock -Text $line -StyleKey 'Dim'
+            $d.Margin = '24,0,8,0'
+            $d.TextWrapping = 'Wrap'
+            [void]$block.Children.Add($d)
+        }
+    }
+    $ok = @($rows | Where-Object { $_.Severity -eq 'ok' } | ForEach-Object { $_.Title })
+    if ($ok.Count) {
+        $tb = New-UTTextBlock -Text ('OK  ' + ($ok -join '   /   ')) -StyleKey 'Dim' -Color $colors.ok
+        $tb.Margin = '8,8,8,0'
+        $tb.TextWrapping = 'Wrap'
+        [void]$panel.Children.Add($tb)
+        Start-UTFadeIn -Element $tb -Offset 6 -DelayMs ([math]::Min(45 * $i, 600))
+    }
+}
+
 function Update-UTRecommendPanel {
     $panel = $sync.RecommendPanel
     $panel.Children.Clear()

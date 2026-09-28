@@ -7,6 +7,38 @@ function New-UTTextBlock {
     return $tb
 }
 
+function Start-UTFadeIn {
+    <#
+    .SYNOPSIS
+        Fades an element in while sliding it up a few pixels. Used on tab switches and result rows.
+    .NOTES
+        A one-shot animation that ends by itself: nothing keeps running afterwards, so the tool costs
+        no CPU or GPU while a game is in the foreground. Any failure leaves the element fully visible.
+    #>
+    param([Parameter(Mandatory = $true)]$Element, [double]$Offset = 8, [int]$DelayMs = 0, [int]$DurationMs = 220)
+    try {
+        $ease = New-Object System.Windows.Media.Animation.CubicEase
+        $ease.EasingMode = [System.Windows.Media.Animation.EasingMode]::EaseOut
+        $dur = New-Object System.Windows.Duration ([TimeSpan]::FromMilliseconds($DurationMs))
+        $fade = New-Object System.Windows.Media.Animation.DoubleAnimation (0.0, 1.0, $dur)
+        $fade.BeginTime = [TimeSpan]::FromMilliseconds($DelayMs)
+        $fade.EasingFunction = $ease
+        # Hidden until a delayed start begins, otherwise the row shows, vanishes and fades back in.
+        $Element.Opacity = 0
+        if ($Offset -ne 0) {
+            $tt = New-Object System.Windows.Media.TranslateTransform (0.0, $Offset)
+            $Element.RenderTransform = $tt
+            $slide = New-Object System.Windows.Media.Animation.DoubleAnimation ($Offset, 0.0, $dur)
+            $slide.BeginTime = $fade.BeginTime
+            $slide.EasingFunction = $ease
+            $tt.BeginAnimation([System.Windows.Media.TranslateTransform]::YProperty, $slide)
+        }
+        $Element.BeginAnimation([System.Windows.UIElement]::OpacityProperty, $fade)
+    } catch {
+        try { $Element.BeginAnimation([System.Windows.UIElement]::OpacityProperty, $null); $Element.Opacity = 1 } catch { }
+    }
+}
+
 function New-UTToolTip {
     <#
     .SYNOPSIS
@@ -375,6 +407,14 @@ function Initialize-UTUI {
         }
     }
     $sync.actionButtons = $buttons
+    # Tab switches fade the page in. Only the TabControl's own selection counts: SelectionChanged also
+    # bubbles up from every ListBox inside the tabs, and those must not replay the animation.
+    $sync.Tabs.Add_SelectionChanged({
+        param($s, $e)
+        if (-not [object]::ReferenceEquals($e.OriginalSource, $s)) { return }
+        $page = $s.Template.FindName('PART_SelectedContentHost', $s)
+        if ($page) { Start-UTFadeIn -Element $page -Offset 10 -DurationMs 240 }
+    })
     if ($sync.sysinfo -and $sync.sysinfo.DifferentUser) {
         Write-UTLog 'You elevated with a different account than the signed-in user. Per-user (HKCU) tweaks will apply to the admin account. Sign in as an administrator to tweak this user.' -Level Warn
     }

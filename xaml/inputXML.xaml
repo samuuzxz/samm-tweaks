@@ -148,18 +148,58 @@
       <Setter Property="Template">
         <Setter.Value>
           <ControlTemplate TargetType="Button">
-            <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
-                    BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="3" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="True">
-              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
-            </Border>
+            <!-- Interaction-only animations: nothing here runs unless the pointer is on the button. -->
+            <Grid x:Name="Root" RenderTransformOrigin="0.5,0.5">
+              <Grid.RenderTransform>
+                <ScaleTransform ScaleX="1" ScaleY="1"/>
+              </Grid.RenderTransform>
+              <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                      BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="3" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="True">
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+              </Border>
+              <Border x:Name="Sheen" CornerRadius="3" Background="White" Opacity="0" IsHitTestVisible="False"/>
+            </Grid>
             <ControlTemplate.Triggers>
               <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Bg3}"/>
-                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource AccentHover}"/>
+                <Trigger.EnterActions>
+                  <BeginStoryboard>
+                    <Storyboard>
+                      <DoubleAnimation Storyboard.TargetName="Sheen" Storyboard.TargetProperty="Opacity" To="0.09" Duration="0:0:0.15"/>
+                    </Storyboard>
+                  </BeginStoryboard>
+                </Trigger.EnterActions>
+                <Trigger.ExitActions>
+                  <BeginStoryboard>
+                    <Storyboard>
+                      <DoubleAnimation Storyboard.TargetName="Sheen" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.3"/>
+                    </Storyboard>
+                  </BeginStoryboard>
+                </Trigger.ExitActions>
               </Trigger>
               <Trigger Property="IsPressed" Value="True">
                 <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Accent}"/>
                 <Setter Property="Foreground" Value="White"/>
+                <Trigger.EnterActions>
+                  <BeginStoryboard>
+                    <Storyboard>
+                      <DoubleAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" To="0.96" Duration="0:0:0.06"/>
+                      <DoubleAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" To="0.96" Duration="0:0:0.06"/>
+                    </Storyboard>
+                  </BeginStoryboard>
+                </Trigger.EnterActions>
+                <Trigger.ExitActions>
+                  <BeginStoryboard>
+                    <Storyboard>
+                      <DoubleAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" To="1" Duration="0:0:0.18">
+                        <DoubleAnimation.EasingFunction><BackEase EasingMode="EaseOut" Amplitude="0.4"/></DoubleAnimation.EasingFunction>
+                      </DoubleAnimation>
+                      <DoubleAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" To="1" Duration="0:0:0.18">
+                        <DoubleAnimation.EasingFunction><BackEase EasingMode="EaseOut" Amplitude="0.4"/></DoubleAnimation.EasingFunction>
+                      </DoubleAnimation>
+                    </Storyboard>
+                  </BeginStoryboard>
+                </Trigger.ExitActions>
               </Trigger>
               <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Opacity" Value="0.45"/>
@@ -192,7 +232,12 @@
               <Border x:Name="Box" Width="16" Height="16" CornerRadius="3" BorderThickness="1"
                       BorderBrush="{DynamicResource FgDim}" Background="{DynamicResource Bg2}" VerticalAlignment="Top" Margin="0,1,0,0" SnapsToDevicePixels="True">
                 <Path x:Name="Mark" Data="M 3,8 L 7,12 L 13,4" Stroke="White" StrokeThickness="2"
-                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Visibility="Collapsed" Stretch="None"/>
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Visibility="Collapsed" Stretch="None"
+                      RenderTransformOrigin="0.5,0.5">
+                  <Path.RenderTransform>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                  </Path.RenderTransform>
+                </Path>
               </Border>
               <ContentPresenter Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center" RecognizesAccessKey="True"/>
             </Grid>
@@ -201,6 +246,18 @@
                 <Setter TargetName="Box" Property="Background" Value="{DynamicResource Accent}"/>
                 <Setter TargetName="Box" Property="BorderBrush" Value="{DynamicResource Accent}"/>
                 <Setter TargetName="Mark" Property="Visibility" Value="Visible"/>
+                <Trigger.EnterActions>
+                  <BeginStoryboard>
+                    <Storyboard>
+                      <DoubleAnimation Storyboard.TargetName="Mark" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" From="0.3" To="1" Duration="0:0:0.2">
+                        <DoubleAnimation.EasingFunction><BackEase EasingMode="EaseOut" Amplitude="0.6"/></DoubleAnimation.EasingFunction>
+                      </DoubleAnimation>
+                      <DoubleAnimation Storyboard.TargetName="Mark" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" From="0.3" To="1" Duration="0:0:0.2">
+                        <DoubleAnimation.EasingFunction><BackEase EasingMode="EaseOut" Amplitude="0.6"/></DoubleAnimation.EasingFunction>
+                      </DoubleAnimation>
+                    </Storyboard>
+                  </BeginStoryboard>
+                </Trigger.EnterActions>
               </Trigger>
               <Trigger Property="IsMouseOver" Value="True">
                 <Setter TargetName="Box" Property="BorderBrush" Value="{DynamicResource AccentHover}"/>
@@ -242,16 +299,36 @@
       <Setter Property="Template">
         <Setter.Value>
           <ControlTemplate TargetType="TabItem">
-            <Border x:Name="Root" Background="Transparent" BorderThickness="0,0,0,2" BorderBrush="Transparent" Padding="{TemplateBinding Padding}" Cursor="Hand" SnapsToDevicePixels="True">
-              <ContentPresenter ContentSource="Header" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
-            </Border>
+            <Grid x:Name="Root" Background="Transparent" Cursor="Hand" SnapsToDevicePixels="True">
+              <ContentPresenter ContentSource="Header" Margin="{TemplateBinding Padding}" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+              <Border x:Name="Underline" Height="2" VerticalAlignment="Bottom" Background="{DynamicResource Accent}" RenderTransformOrigin="0.5,0.5">
+                <Border.RenderTransform>
+                  <ScaleTransform ScaleX="0" ScaleY="1"/>
+                </Border.RenderTransform>
+              </Border>
+            </Grid>
             <ControlTemplate.Triggers>
               <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource Fg}"/>
               </Trigger>
               <Trigger Property="IsSelected" Value="True">
-                <Setter TargetName="Root" Property="BorderBrush" Value="{DynamicResource Accent}"/>
                 <Setter Property="Foreground" Value="{DynamicResource Fg}"/>
+                <Trigger.EnterActions>
+                  <BeginStoryboard>
+                    <Storyboard>
+                      <DoubleAnimation Storyboard.TargetName="Underline" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" To="1" Duration="0:0:0.22">
+                        <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                      </DoubleAnimation>
+                    </Storyboard>
+                  </BeginStoryboard>
+                </Trigger.EnterActions>
+                <Trigger.ExitActions>
+                  <BeginStoryboard>
+                    <Storyboard>
+                      <DoubleAnimation Storyboard.TargetName="Underline" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" To="0" Duration="0:0:0.15"/>
+                    </Storyboard>
+                  </BeginStoryboard>
+                </Trigger.ExitActions>
               </Trigger>
             </ControlTemplate.Triggers>
           </ControlTemplate>
@@ -552,6 +629,12 @@
           <TabItem Header="SYSTEM">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
               <StackPanel Margin="8,4,8,16">
+                <TextBlock Text="FPS doctor: what is capping your frame rate" Style="{StaticResource SectionHeader}"/>
+                <TextBlock Style="{StaticResource Dim}" TextWrapping="Wrap" Text="Past the safe preset, Windows tweaks stop adding frames. What is left is usually outside Windows: a frame cap, the wrong renderer, memory without XMP or on one channel, the monitor in the motherboard port, the wrong GPU, a laptop on battery. This reads all of it and changes nothing."/>
+                <StackPanel Orientation="Horizontal" Margin="8,6,0,4">
+                  <Button Name="BtnFpsDoctor" Content="Check what limits my FPS" Style="{StaticResource AccentButton}" ToolTip="Read-only. Reads Fortnite's frame cap, renderer, VSync and ray tracing from GameUserSettings.ini, memory speed, rated speed and channels, which GPU drives the monitor, the GPU's PCIe link, the refresh rate, battery and power plan, and which GPU Fortnite is assigned to. Each finding says where to fix it. Nothing is written."/>
+                </StackPanel>
+                <StackPanel Name="FpsDoctorPanel"/>
                 <TextBlock Text="This PC" Style="{StaticResource SectionHeader}"/>
                 <TextBlock Name="SysTierText" Style="{StaticResource Body}" Text=""/>
                 <StackPanel Orientation="Horizontal" Margin="8,6,0,4">

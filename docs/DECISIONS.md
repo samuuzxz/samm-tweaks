@@ -853,3 +853,91 @@ fails the suite rather than showing up as a blank taskbar button on someone's ma
 screenshot - the exe is built from it and the window carries a copy - so `assets/icon.png` and
 `assets/icon.ico` are whitelisted after that rule, where a later negation wins, and `.gitattributes`
 marks `*.ico` binary alongside `*.png` so normalisation never touches them.
+
+## 20. FPS doctor, the Fortnite GPU assignment, and interaction animations (2026-09-28)
+
+Asked for as "stronger tweaks, 200 FPS to 350-400", then narrowed by the user to the real complaint:
+200 FPS in an empty Creative island, 90-120 in a real fight, and "zero delay". Section 12 and the
+tables in the README already explain why no further registry key closes that gap. The safe preset
+plus the risky VBS item is where Windows stops adding frames. So this release adds no new registry
+"boost". It adds a read-only diagnosis of the things that do cap frame rate and that no tweak
+touches, and one tweak with a documented mechanism.
+
+### Why fights drop and Creative does not
+
+A Creative island has almost nothing to draw or simulate. A fight adds build pieces, edits,
+destruction, particles and other players all at once. That load lands on the CPU (draw calls,
+game thread) and on memory bandwidth, and it grows with the settings that scale with object count:
+mesh quality, shadows, effects, and in late game view distance. So the fight number is set by the
+CPU, the memory and those settings, and not by the GPU or by Windows scheduling keys. The doctor
+checks exactly those.
+
+### What the doctor reads (SYSTEM tab, `Get-UTFpsDoctor.ps1`)
+
+Facts collection (`Get-UTFpsDoctorFacts`) and the rules (`Get-UTFpsDoctorFindings`) are separate.
+The rules are pure, so each one is unit-tested with a synthetic machine in `Test-Logic.ps1`. The
+collection only reads. Each probe is wrapped on its own, and a probe that fails leaves its field
+empty rather than producing a claim.
+
+- **Fortnite's own settings** from GameUserSettings.ini: `FrameRateLimit`, which is often the whole
+  reason a number is "stuck" at 200 or 240. Also VSync, the renderer (Performance Mode or not), ray
+  tracing, Nanite, window mode, mesh quality in Performance Mode, shadows, effects, view distance,
+  and Reflex (`LatencyTweak2`: 0 off, 1 on, 2 on + boost). Reflex is judged only when an NVIDIA GPU is
+  present, because the key is written on every PC but AMD and Intel cards cannot turn it on.
+- **Memory:** `Win32_PhysicalMemory`. `ConfiguredClockSpeed` is the running speed. It is doubled
+  when firmware reports MHz instead of MT/s (DDR4 below 1800, DDR5 below 3600). A single stick counts
+  as single channel. Two or more sticks count as single channel only when every slot label is
+  readable and names the same channel; an unreadable label means no claim. The rated XMP/EXPO speed
+  is not exposed by Windows. It is read from the part number, only for naming schemes that encode it
+  unambiguously (G.Skill, Kingston FURY, Corsair Vengeance, Crucial Ballistix, TeamGroup T-Force).
+  Any other kit falls back to a softer check: DDR4 at or below 2666 or DDR5 at or below 4800 on a
+  desktop is the JEDEC fallback, so the doctor says "check the label", not "fix". Laptops are
+  exempt from that check, because JEDEC speeds are normal there.
+- **GPU:** a Microsoft Basic Display Adapter means no driver. On a desktop with both an integrated and
+  a discrete GPU, an active display on the integrated GPU while the discrete one drives nothing means
+  the monitor cable is in the motherboard. Laptops are exempt, because their panel is always wired
+  through the iGPU. The PCIe link is read as `DEVPKEY_PciDevice_CurrentLinkWidth` against
+  `MaxLinkWidth`, which is the card's own capability, not the slot's. So a x16 card in a x4 chipset
+  slot shows up. nvidia-smi was rejected here because its "max" is already limited by the slot. A
+  width at half or less of the maximum is a "check with GPU-Z under load", not a fix, because some
+  platforms change the link at idle.
+- **Display:** current refresh rate against the highest the panel lists at the current resolution,
+  using the same `UT.NativeV1.Display` helper as the STRETCHED tab. A gap of 1 Hz is ignored
+  (59.94/60, 239.76/240).
+- **Power:** `Win32_Battery.BatteryStatus = 1` (discharging), and the Power saver plan by GUID,
+  because plan names are translated.
+- **Storage:** Fortnite on a hard disk, reported as stutter and not as lower FPS.
+
+Impact is given in words (large, medium, "in fights", "stutter"), never as a percentage. How much
+each item is worth depends on how CPU-bound the machine is, so a number would be invented.
+
+### `UTFortniteGpuPref` (optional tier)
+
+`HKCU\Software\Microsoft\DirectX\UserGpuPreferences`, value named after the full path of
+`FortniteClient-Win64-Shipping.exe`, data `GpuPreference=2;`. This is exactly what Settings > System >
+Display > Graphics > High performance writes. Other tokens already in that string (for example
+`SwapEffectUpgradeEnable=1`) are kept. The previous value and the exe path are recorded with
+`Save-UTScriptState`. Undo restores the previous string, or removes the value when there was none.
+The tweak is refused (guard, before any snapshot) on a single-GPU PC or without Fortnite installed.
+It is recommended, and ticked, only when the machine has an integrated and a discrete GPU. The exe
+path is built by string concatenation rather than `Join-Path`, which throws when the drive letter
+is not currently mounted.
+
+### "Zero delay"
+
+Input delay cannot reach zero: the mouse, the game, the render queue and the display each take
+time. What a setting can remove is the render queue, and that is Reflex On + Boost. The profiles
+already write it, and the doctor now flags it when it is off. VSync off, exclusive fullscreen and
+the one-pre-rendered-frame driver setting (section 15) are the rest of it. Nothing else was added.
+Nagle, TcpAckFrequency and the other "0 delay" network keys are placebo for UDP games (README table).
+
+### Animations
+
+Only on interaction, and all declared in XAML, except one helper. Buttons fade a white sheen in on
+hover and squeeze to 96 percent on press, springing back with a BackEase. The tab underline grows
+from the centre. A checkbox tick pops in. `Start-UTFadeIn` fades and slides the page in on a tab
+switch, and cascades the FPS doctor findings, worst first. Every animation is one-shot and ends by
+itself; nothing loops. So the tool uses no CPU or GPU while a game is in the foreground, which is
+the one thing a tool like this must not get wrong. The tab hook ignores `SelectionChanged` events
+that bubble up from ListBoxes inside the tabs. If an animation fails, the element is left fully
+visible.

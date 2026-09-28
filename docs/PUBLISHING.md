@@ -104,7 +104,7 @@ The order of operations, so the one-liner never points at something public:
 3. Build the beta script and commit it:
 
    ```powershell
-   .\Compile.ps1 -Beta -Version 0.0.67 -StatusUrl https://unknowntweaks-gate.unknowntweaks.workers.dev/status
+   .\Compile.ps1 -Beta -Version 0.0.68 -StatusUrl https://unknowntweaks-gate.unknowntweaks.workers.dev/status
    ```
 
    The workflow does this on every push by itself: `GATE_URL` is set in the Compile step of

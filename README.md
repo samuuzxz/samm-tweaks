@@ -42,7 +42,7 @@ Wi-Fi.
   fullscreen-optimizations off, power throttling off, Ultimate Performance plan, hibernation off,
   visual effects for performance, feature-update deferral, NIC power saving off, background Store
   apps off, location off, Teredo off, search indexing off, NVIDIA / AMD telemetry and updater
-  tasks off.
+  tasks off, Fortnite on the high-performance GPU (PCs with an integrated and a discrete GPU).
 - **Risky**: memory integrity (HVCI) off, virtualization-based security off (the whole
   hypervisor, the largest measured FPS item), dynamic tick off (with BitLocker suspended for one
   reboot first), global timer resolution key, MSI mode for the GPU, Fortnite process priority via
@@ -52,7 +52,25 @@ Wi-Fi.
 Every item in the list is one line. Hover it for what it changes, why it works, and where that
 comes from.
 
-**SYSTEM tab**: a ten-second synthetic benchmark (CPU single and all cores, memory copy, and the
+**SYSTEM tab**, first the **FPS doctor**. Once the safe preset is applied, Windows tweaks stop
+adding frames. The usual reason for "200 FPS in Creative, 90 in a fight" is somewhere a registry key
+cannot reach, so the doctor reads those places and changes nothing:
+
+- Fortnite's own settings: the frame cap (often the whole reason a number is stuck at 200 or 240),
+  VSync, Performance Mode or not, ray tracing, Nanite, window mode, and the settings that grow with a
+  fight: mesh quality, shadows, effects, view distance. Also NVIDIA Reflex On + Boost, the setting
+  that removes the most input delay.
+- Memory: single channel (one stick, or two sticks in the same channel), and XMP / EXPO off. The
+  rated speed is read from the kit's part number where the brand encodes it.
+- GPU: a GPU with no driver, the monitor cable in the motherboard instead of the graphics card,
+  the GPU running on fewer PCIe lanes than it supports, and which GPU Fortnite is assigned to on a
+  two-GPU PC.
+- The monitor left at 60 Hz, a laptop on battery, the Power saver plan, Fortnite on a hard disk.
+
+Each finding says where to fix it, worst first, with the impact in words: the size of a gain
+depends on how CPU-bound the PC is, so a percentage would be made up.
+
+Then a ten-second synthetic benchmark (CPU single and all cores, memory copy, and the
 system disk read and written with the Windows cache bypassed), scored against a fixed reference
 machine so it reads as a rough tier, not a game FPS number. **Recommend for this PC** then reads the
 hardware facts and the benchmark and lists the tweaks that apply here with the reason for each -

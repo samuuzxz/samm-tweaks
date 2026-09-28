@@ -161,6 +161,28 @@ Do this on a machine you can restore. Removal is the one thing Undo cannot rever
 | Windows Security | Still opens |
 | Game Pass / Xbox sign-in | Launch a Game Pass or Microsoft-published title and confirm it still signs in. `Get-AppxPackage Microsoft.XboxIdentityProvider` and `Microsoft.GamingServices` must both still be present - the tool refuses to remove them, and this is the check that proves it |
 | Reinstall one from the Store | Works, and it comes back with its data reset |
+## 7c. SYSTEM tab: FPS doctor
+
+1. Press **Check what limits my FPS**. The findings appear within a few seconds, worst first, and
+   the OUTPUT pane logs the same list. Nothing is written: `%ProgramData%\unknowntweaks\backup` does
+   not change.
+2. In Fortnite set Frame Rate Limit to 144, close the game, and run the check again: "Fortnite is
+   capped at 144 FPS" must be the first line. Set Mesh to High in Performance Mode and confirm it is
+   named too.
+3. On a desktop with the iGPU enabled in the BIOS, plug the monitor into the motherboard and confirm
+   the "monitor is plugged into the motherboard" finding. Move the cable back and it disappears.
+4. With one memory stick removed, confirm "single channel". With XMP off, confirm the rated-speed
+   or JEDEC finding.
+5. On a two-GPU PC apply **Fortnite on the high-performance GPU**. Settings > System > Display >
+   Graphics must show Fortnite as High performance. Undo it and it must go back to what it was.
+   On a single-GPU PC it must be refused, with no snapshot left behind.
+
+## 7d. Animations
+
+1. Hover and press buttons, switch tabs, tick checkboxes: every animation plays once and stops.
+2. Leave the window open behind a running game and watch Task Manager. unknowntweaks must stay at
+   the CPU use of its one-second sampler. No animation keeps running.
+
 ## 8. Things to try to break it
 
 - Close the window while a job is running: it should ask before closing, then shut down cleanly with

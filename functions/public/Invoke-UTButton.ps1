@@ -237,6 +237,12 @@ Remove-UTBloatApps -Names ([string[]]$Arguments.Names) -AllUsers:([bool]$Argumen
             'BtnBenchmark' {
                 if (Start-UTUIJob -Kind 'benchmark' -Script 'Invoke-UTBenchmark | Out-Null') { $sync.BenchBox.Text = 'running, about ten seconds...' }
             }
+            'BtnFpsDoctor' {
+                if (Start-UTUIJob -Kind 'fpsdoctor' -Script 'Invoke-UTFpsDoctor | Out-Null') {
+                    $sync.FpsDoctorPanel.Children.Clear()
+                    [void]$sync.FpsDoctorPanel.Children.Add((New-UTTextBlock -Text 'checking, a few seconds...' -StyleKey 'Dim'))
+                }
+            }
             'BtnRecommendForPc' { Update-UTRecommendPanel }
             'BtnRecommendTick' {
                 $n = 0

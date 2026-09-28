@@ -636,6 +636,24 @@
       }
     ]
   },
+  "UTFortniteGpuPref": {
+    "Content": "Fortnite on the high-performance GPU (PCs with two GPUs)",
+    "Description": "On a laptop, or a desktop with the integrated graphics still enabled, Windows decides per game which GPU renders it, and it sometimes picks the integrated one: Fortnite then runs at a fraction of the frame rate the graphics card could give. This sets the same per-app preference as Settings > System > Display > Graphics > Fortnite > High performance, for FortniteClient-Win64-Shipping.exe in your install folder. Any other options already stored for that exe are kept. It is refused on a PC with a single GPU, where there is nothing to choose. Run the FPS doctor in the SYSTEM tab to see whether this PC needs it.",
+    "Evidence": "HKCU\\Software\\Microsoft\\DirectX\\UserGpuPreferences, value named after the full exe path, data GpuPreference=2; is what the Windows Graphics settings page writes for High performance (0 = let Windows decide, 1 = power saving, 2 = high performance). DirectX reads it when the game creates its device, so it applies at the next launch. Microsoft Support, Manage graphics settings for apps. Confidence: high.",
+    "Category": "Gaming",
+    "Tier": "optional",
+    "Recommended": false,
+    "Order": 104,
+    "GuardScript": [
+      "if ($sync.sysinfo -and @($sync.sysinfo.GPUs).Count -lt 2) { throw 'This PC has one GPU, so there is nothing to choose between and this tweak would change nothing' }; $fn = Get-UTFortnite; if (-not $fn.Installed -or -not $fn.InstallLocation) { throw 'Fortnite is not installed, so there is no game file to assign a GPU to' }; if ($fn.GameRunning) { Write-UTLog 'Fortnite is running: the GPU assignment takes effect the next time it starts' -Level Warn }"
+    ],
+    "InvokeScript": [
+      "$fn = Get-UTFortnite; $exe = Get-UTFortniteExePath -InstallLocation $fn.InstallLocation; $p = 'HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences'; if (-not (Test-Path $p)) { New-Item $p -Force | Out-Null }; $v = (Get-ItemProperty $p -Name $exe -ErrorAction SilentlyContinue).$exe; Save-UTScriptState -Id UTFortniteGpuPref -Key Exe -Value $exe; Save-UTScriptState -Id UTFortniteGpuPref -Key Previous -Value ([string]$v); $tokens = @(); if ($v) { $tokens = @($v -split ';' | Where-Object { $_ -and $_ -notmatch '^GpuPreference=' }) }; $tokens = @('GpuPreference=2') + $tokens; Set-ItemProperty $p -Name $exe -Type String -Value (($tokens -join ';') + ';'); Write-UTLog ('Fortnite assigned to the high-performance GPU: ' + $exe)"
+    ],
+    "UndoScript": [
+      "$p = 'HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences'; $exe = Get-UTScriptState -Id UTFortniteGpuPref -Key Exe; if (-not $exe) { return }; $prev = Get-UTScriptState -Id UTFortniteGpuPref -Key Previous; if ([string]::IsNullOrEmpty($prev)) { Remove-ItemProperty $p -Name $exe -ErrorAction SilentlyContinue } else { Set-ItemProperty $p -Name $exe -Type String -Value $prev }"
+    ]
+  },
   "UTPowerThrottlingOff": {
     "Content": "Power throttling of background apps off (laptops on AC)",
     "Description": "Windows never throttles the focused game, only background apps, so this helps laptops that run Discord, browsers or overlays alongside the game while plugged in. No effect on desktops.",

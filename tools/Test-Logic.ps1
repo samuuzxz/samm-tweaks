@@ -22,7 +22,7 @@ $sync.backupDir = Join-Path ([System.IO.Path]::GetTempPath()) ('ut-test-' + [gui
 $sync.configs = @{}
 $sync.form = $null
 $sync.status = ''
-foreach ($f in 'Write-UTLog', 'Set-UTRegistry', 'Set-UTIniValue', 'Save-UTBackup', 'Set-UTLaunchArgs', 'Invoke-UTTweaks', 'Get-UTStartupItems', 'Remove-UTAppxPackages', 'Measure-UTRegionPing', 'Test-UTDnsLatency', 'Test-UTBetaGate', 'Get-UTGameReady', 'Get-UTRunningGame', 'Invoke-UTBenchmark', 'Get-UTValorant', 'Set-UTNvProfile', 'Invoke-UTSimple') {
+foreach ($f in 'Write-UTLog', 'Set-UTRegistry', 'Set-UTIniValue', 'Save-UTBackup', 'Set-UTLaunchArgs', 'Invoke-UTTweaks', 'Get-UTStartupItems', 'Remove-UTAppxPackages', 'Measure-UTRegionPing', 'Test-UTDnsLatency', 'Test-UTBetaGate', 'Get-UTGameReady', 'Get-UTRunningGame', 'Invoke-UTBenchmark', 'Get-UTValorant', 'Set-UTNvProfile', 'Invoke-UTSimple', 'Get-UTFpsDoctor') {
     . (Join-Path $Root "functions/private/$f.ps1")
 }
 foreach ($j in 'gameservers', 'dns', 'tweaks', 'fortnite', 'debloat', 'games', 'gameready', 'valorant', 'stretched', 'nvprofile', 'simple') {
@@ -273,6 +273,98 @@ Assert (@($rec | Where-Object { $_.Why }).Count -eq $rec.Count) 'every recommend
 Assert ((Get-UTPerformanceTier -CpuSingle 95 -CpuMulti 90 -Gpu 'NVIDIA GeForce RTX 4070') -eq 'high-end') 'tier: fast CPU + RTX 40 = high-end'
 Assert ((Get-UTPerformanceTier -CpuSingle 95 -CpuMulti 90 -Gpu 'Intel(R) UHD Graphics 630') -eq 'low') 'tier: an iGPU caps the tier at low'
 $sync.sysinfo = $null
+
+$sync.sysinfo = [pscustomobject]@{ VBSStatus = 0; HVCIRunning = $false; IsLaptop = $true; DiskType = 'SSD'; GPUVendor = 'NVIDIA'; GPU = 'NVIDIA GeForce RTX 4060 Laptop GPU'; Is11 = $true; Build = 22631; CPU = 'Intel Core i7-13700H'; RamGB = 16
+    GPUs = @([pscustomobject]@{ Name = 'Intel(R) UHD Graphics' }, [pscustomobject]@{ Name = 'NVIDIA GeForce RTX 4060 Laptop GPU' }) }
+$rec = @(Get-UTRecommendations)
+Assert (@($rec | Where-Object { $_.Id -eq 'UTFortniteGpuPref' -and $_.Tick }).Count -eq 1) 'a two-GPU PC gets the Fortnite GPU assignment ticked'
+$sync.sysinfo.GPUs = @([pscustomobject]@{ Name = 'NVIDIA GeForce RTX 4070' })
+Assert (@(Get-UTRecommendations | Where-Object { $_.Id -eq 'UTFortniteGpuPref' }).Count -eq 0) 'a single-GPU PC does not'
+$sync.sysinfo = $null
+
+Write-Host "fps doctor"
+Assert ((Get-UTMemoryRatedSpeed 'F4-3600C16-8GVKC') -eq 3600) 'G.Skill DDR4 part number -> 3600'
+Assert ((Get-UTMemoryRatedSpeed 'F5-6000J3038F16GX2-TZ5RK') -eq 6000) 'G.Skill DDR5 part number -> 6000'
+Assert ((Get-UTMemoryRatedSpeed 'KF436C17BB/8     ') -eq 3600) 'Kingston FURY DDR4, padded as WMI pads it -> 3600'
+Assert ((Get-UTMemoryRatedSpeed 'KF560C40BBK2-32') -eq 6000) 'Kingston FURY DDR5 -> 6000'
+Assert ((Get-UTMemoryRatedSpeed 'CMK16GX4M2B3200C16') -eq 3200) 'Corsair Vengeance LPX -> 3200'
+Assert ((Get-UTMemoryRatedSpeed 'CMH32GX5M2B6000C30') -eq 6000) 'Corsair DDR5 -> 6000'
+Assert ((Get-UTMemoryRatedSpeed 'BL2K8G36C16U4B') -eq 3600) 'Crucial Ballistix -> 3600'
+Assert ((Get-UTMemoryRatedSpeed 'TF3D416G3600HC18J') -eq 3600) 'TeamGroup T-Force -> 3600'
+Assert ((Get-UTMemoryRatedSpeed 'M378A1K43CB2-CTD') -eq 0) 'a JEDEC OEM part number makes no claim'
+Assert ((Get-UTMemoryRatedSpeed '') -eq 0) 'an empty part number makes no claim'
+Assert ((Get-UTMemoryChannel 'P0 CHANNEL A' 'DIMM 1') -eq 'A') 'channel from an AMD bank label'
+Assert ((Get-UTMemoryChannel 'BANK 0' 'Controller0-ChannelB-DIMM0') -eq 'B') 'channel from an Intel device locator'
+Assert ((Get-UTMemoryChannel '' 'DIMM_A2') -eq 'A') 'channel from a DIMM_A2 slot name'
+Assert ((Get-UTMemoryChannel 'BANK 2' 'DIMM 3') -eq '') 'no channel claimed from slot numbers alone'
+Assert ((Get-UTGpuKind 'NVIDIA GeForce RTX 3060') -eq 'discrete') 'GeForce is discrete'
+Assert ((Get-UTGpuKind 'AMD Radeon RX 7800 XT') -eq 'discrete') 'Radeon RX is discrete'
+Assert ((Get-UTGpuKind 'AMD Radeon(TM) Graphics') -eq 'integrated') 'Radeon Graphics is integrated'
+Assert ((Get-UTGpuKind 'Intel(R) Arc(TM) A770 Graphics') -eq 'discrete') 'Arc A770 is discrete'
+Assert ((Get-UTGpuKind 'Intel(R) Arc(TM) Graphics') -eq 'integrated') 'Core Ultra Arc iGPU is integrated'
+Assert ((Get-UTGpuKind 'Microsoft Basic Display Adapter') -eq 'basic') 'the basic adapter means no driver'
+
+$base = [ordered]@{
+    IsLaptop = $false; RamGB = 32; VBS = $false; OnBattery = $false; PowerSaver = $false
+    MemoryType = 'DDR4'; MemoryMTs = 3600; MemoryRatedMTs = 3600; DimmCount = 2; DimmChannels = @('A', 'B')
+    Gpus = @([pscustomobject]@{ Name = 'NVIDIA GeForce RTX 3070'; Kind = 'discrete'; DrivesDisplay = $true; PnpId = 'x' })
+    DisplayGpu = 'NVIDIA GeForce RTX 3070'; PcieWidth = 16; PcieMaxWidth = 16; PcieGpu = 'NVIDIA GeForce RTX 3070'
+    Hz = 240; MaxHzAtRes = 240; Width = 1920; Height = 1080
+    FnInstalled = $true; FnIniExists = $true; FnFrameRateLimit = 0.0; FnVSync = 'False'; FnFullscreenMode = '0'
+    FnRHI = 'dx12'; FnFeatureLevel = 'es31'; FnRayTracing = 'False'; FnNanite = 'False'
+    FnReflex = '2'; FnMeshQuality = '0'; FnViewDistance = '0'; FnShadows = '0'; FnEffects = '0'
+    FnExe = 'C:\Fortnite\FortniteGame\Binaries\Win64\FortniteClient-Win64-Shipping.exe'; FnGpuPreference = ''; FnOnHdd = $false
+}
+$doc = { param($Changes) $h = [ordered]@{}; foreach ($k in $base.Keys) { $h[$k] = $base[$k] }; foreach ($k in $Changes.Keys) { $h[$k] = $Changes[$k] }; @(Get-UTFpsDoctorFindings -Facts ([pscustomobject]$h)) }
+$has = { param($Rows, $Sev, $Pattern) @($Rows | Where-Object { $_.Severity -eq $Sev -and $_.Title -match $Pattern }).Count -gt 0 }
+$clean = & $doc @{}
+Assert (@($clean | Where-Object { $_.Severity -in 'fix', 'warn' }).Count -eq 0) ('a well-set-up PC gets nothing to fix' + $(if (@($clean | Where-Object { $_.Severity -in 'fix', 'warn' })) { ': ' + (@($clean | Where-Object { $_.Severity -in 'fix', 'warn' } | ForEach-Object { $_.Title }) -join '; ') } else { '' }))
+Assert (@($clean | Where-Object { $_.Severity -eq 'ok' }).Count -ge 5) 'and the checks that passed are listed'
+Assert (& $has (& $doc @{ FnFrameRateLimit = 200.0 }) 'fix' 'capped at 200 FPS') 'a 200 FPS cap in the ini is the first thing named'
+Assert ((& $doc @{ FnFrameRateLimit = 200.0 })[0].Severity -eq 'fix') 'fixes sort first'
+Assert (& $has (& $doc @{ FnVSync = 'True' }) 'fix' 'VSync') 'VSync on is a fix'
+Assert (& $has (& $doc @{ FnFeatureLevel = 'sm6' }) 'fix' 'full DirectX 12 renderer') 'DX12 instead of Performance Mode is a fix'
+Assert (& $has (& $doc @{ FnRHI = 'dx11'; FnFeatureLevel = 'sm5' }) 'fix' 'full DirectX 11 renderer') 'the renderer is named correctly for DX11'
+Assert (& $has (& $doc @{ FnRayTracing = 'True' }) 'fix' 'ray tracing') 'ray tracing on is a fix'
+Assert (& $has (& $doc @{ FnMeshQuality = '1' }) 'fix' 'Mesh quality is High') 'High meshes in Performance Mode is a fix (the fight-drop setting)'
+Assert (-not (& $has (& $doc @{ FnMeshQuality = '1'; FnFeatureLevel = 'sm6' }) 'fix' 'Mesh')) 'mesh quality is only judged in Performance Mode, where it exists'
+Assert (& $has (& $doc @{ FnShadows = '2' }) 'fix' 'Shadows') 'shadows on is a fix'
+Assert (& $has (& $doc @{ FnEffects = '3' }) 'warn' 'Effects') 'effects above Low is a check'
+Assert (& $has (& $doc @{ FnViewDistance = '3' }) 'info' 'View distance') 'Epic view distance is only context'
+Assert (& $has (& $doc @{ FnReflex = '0' }) 'fix' 'Reflex is off') 'Reflex off is a latency fix'
+Assert (& $has (& $doc @{ FnReflex = '1' }) 'fix' 'not On \+ Boost') 'Reflex On without Boost is named'
+Assert (-not (& $has (& $doc @{ FnReflex = '' }) 'fix' 'Reflex')) 'no Reflex claim when the key is absent (AMD, Intel)'
+Assert (-not (& $has (& $doc @{ FnReflex = '0'; Gpus = @([pscustomobject]@{ Name = 'AMD Radeon RX 7800 XT'; Kind = 'discrete'; DrivesDisplay = $true; PnpId = 'x' }) }) 'fix' 'Reflex')) 'no Reflex claim on an AMD card, which cannot turn it on'
+Assert (& $has (& $doc @{ DimmCount = 1; DimmChannels = @('A') }) 'fix' 'single channel') 'one stick on a desktop is a fix'
+Assert (& $has (& $doc @{ DimmCount = 1; DimmChannels = @('A'); IsLaptop = $true }) 'warn' 'single channel') 'one stick on a laptop is only a check'
+Assert (& $has (& $doc @{ DimmChannels = @('A', 'A') }) 'fix' 'channel A') 'two sticks in the same channel is a fix'
+Assert (-not (& $has (& $doc @{ DimmChannels = @('A', '') }) 'fix' 'channel')) 'no channel claim when a slot label is unreadable'
+Assert (& $has (& $doc @{ MemoryMTs = 2133; MemoryRatedMTs = 3600 }) 'fix' 'rated 3600') 'XMP off with a readable part number is a fix with the rated speed'
+Assert (& $has (& $doc @{ MemoryMTs = 2400; MemoryRatedMTs = 0 }) 'warn' 'JEDEC default') 'DDR4-2400 with an unknown part number is a check'
+Assert (& $has (& $doc @{ MemoryType = 'DDR5'; MemoryMTs = 4800; MemoryRatedMTs = 0 }) 'warn' 'JEDEC default') 'DDR5-4800 is a check'
+Assert (-not (& $has (& $doc @{ MemoryType = 'DDR5'; MemoryMTs = 4800; MemoryRatedMTs = 0; IsLaptop = $true }) 'warn' 'JEDEC')) 'DDR5-4800 on a laptop is normal, not flagged'
+Assert (-not (& $has (& $doc @{ MemoryMTs = 3200; MemoryRatedMTs = 3200 }) 'fix' 'rated')) 'running at the rated speed is not flagged'
+$twoGpu = @([pscustomobject]@{ Name = 'Intel(R) UHD Graphics 770'; Kind = 'integrated'; DrivesDisplay = $true; PnpId = 'i' },
+            [pscustomobject]@{ Name = 'NVIDIA GeForce RTX 3070'; Kind = 'discrete'; DrivesDisplay = $false; PnpId = 'x' })
+Assert (& $has (& $doc @{ Gpus = $twoGpu }) 'fix' 'motherboard') 'monitor on the iGPU of a desktop is a fix'
+Assert (-not (& $has (& $doc @{ Gpus = $twoGpu; IsLaptop = $true }) 'fix' 'motherboard')) 'but not on a laptop, where the iGPU always drives the panel'
+Assert (& $has (& $doc @{ Gpus = $twoGpu }) 'warn' 'no GPU assignment') 'two GPUs and no preference for Fortnite is a check'
+Assert (& $has (& $doc @{ Gpus = $twoGpu; FnGpuPreference = 'SwapEffectUpgradeEnable=1;GpuPreference=2;' }) 'ok' 'high-performance GPU') 'an existing preference is recognised inside a longer string'
+Assert (& $has (& $doc @{ Gpus = @([pscustomobject]@{ Name = 'Microsoft Basic Display Adapter'; Kind = 'basic'; DrivesDisplay = $true; PnpId = '' }) }) 'fix' 'no driver') 'a GPU without a driver is a fix'
+Assert (& $has (& $doc @{ PcieWidth = 4 }) 'warn' 'x4 of x16') 'a x16 card at x4 is a check'
+Assert (-not (& $has (& $doc @{ PcieWidth = 8; PcieMaxWidth = 8 }) 'warn' 'link')) 'a x8 card at x8 is fine'
+Assert (& $has (& $doc @{ Hz = 60 }) 'fix' '60 Hz but supports 240') 'a 240 Hz panel left at 60 Hz is a fix'
+Assert (-not (& $has (& $doc @{ Hz = 239; MaxHzAtRes = 240 }) 'fix' 'Hz')) '239.76 vs 240 rounding is not flagged'
+Assert (& $has (& $doc @{ OnBattery = $true; IsLaptop = $true }) 'fix' 'battery') 'a laptop on battery is a fix'
+Assert (& $has (& $doc @{ PowerSaver = $true }) 'fix' 'Power saver') 'the Power saver plan is a fix'
+Assert (& $has (& $doc @{ RamGB = 8 }) 'warn' '8 GB') '8 GB of RAM is a check'
+Assert (& $has (& $doc @{ FnOnHdd = $true }) 'warn' 'hard disk') 'Fortnite on a hard disk is a check'
+Assert (& $has (& $doc @{ FnInstalled = $false; FnIniExists = $false; FnFrameRateLimit = $null; FnFeatureLevel = ''; FnVSync = '' }) 'info' 'not found') 'no Fortnite is said, not silently skipped'
+Assert (@(& $doc @{ FnFrameRateLimit = 144.0; DimmCount = 1; OnBattery = $true } | Where-Object { -not $_.Action -and $_.Severity -in 'fix', 'warn' }).Count -eq 0) 'every fix and check says what to do'
+$gp = $tw.UTFortniteGpuPref
+Assert ($gp -and $gp.Tier -eq 'optional' -and -not $gp.Recommended) 'the GPU assignment tweak is optional and outside the preset'
+Assert ((@($gp.InvokeScript) -join ' ') -match 'Save-UTScriptState -Id UTFortniteGpuPref -Key Previous' -and (@($gp.UndoScript) -join ' ') -match 'Get-UTScriptState -Id UTFortniteGpuPref -Key Previous') 'the GPU assignment records the previous value and undo restores it'
+Assert ((Get-UTFortniteExePath -InstallLocation 'C:\Games\Fortnite') -match 'FortniteGame.Binaries.Win64.FortniteClient-Win64-Shipping\.exe$') 'the per-app preference targets the Shipping exe'
 
 Write-Host "table formatting"
 # 'Internet (Cloudflare)' is 21 characters and is the real label of the baseline row, so it is the

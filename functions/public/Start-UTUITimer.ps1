@@ -38,6 +38,7 @@ function Complete-UTJob {
         'stretched' { Update-UTStretchedStatus }
         'gameready' { Initialize-UTGameReadyList }
         'benchmark' { Update-UTBenchBox; Update-UTRecommendPanel }
+        'fpsdoctor' { Update-UTFpsDoctorPanel }
         'install'   { }
         'net'       { }
     }

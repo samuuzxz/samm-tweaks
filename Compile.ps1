@@ -31,7 +31,7 @@ param(
     [string]$Owner  = 'unknownaimer',
     [string]$Repo   = 'unknownutility',
     [string]$Branch = 'main',
-    [string]$Version = '0.0.67',
+    [string]$Version = '0.0.68',
     [switch]$Beta,
     [string]$Url,
     [string]$StatusUrl,

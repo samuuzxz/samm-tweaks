@@ -100,6 +100,8 @@ function Get-UTRecommendations {
     if ($si.DiskType -eq 'HDD') { & $add 'UTSearchIndexOff' 'the system drive is a hard disk: the indexer causes I/O stutter there' $true }
     if ($si.GPUVendor -eq 'NVIDIA' -or $si.GPUVendor -eq 'AMD') { & $add 'UTVendorGpuTasks' ($si.GPUVendor + ' driver: its telemetry and update-check tasks run in the background') $true }
     if ($si.GPU -match 'RTX|RX (5|6|7|9)\d\d\d|GTX 1[06]\d0') { & $add 'UTHAGS' 'this GPU supports hardware scheduling; required for DLSS Frame Generation, otherwise neutral' $false }
+    $kinds = @($si.GPUs | Where-Object { $_ } | ForEach-Object { Get-UTGpuKind -Name ([string]$_.Name) })
+    if ($kinds -contains 'discrete' -and $kinds -contains 'integrated') { & $add 'UTFortniteGpuPref' 'two GPUs, integrated and discrete: Windows may render Fortnite on the integrated one unless it is told otherwise' $true }
     if ($si.Is11 -and $si.Build -ge 22621) { & $add 'UTWindowedGamesOpt' 'Windows 11 22H2+: flip-model presentation for windowed games lowers latency' $true }
     if ($si.CPU -match 'X3D') { & $add 'UTCoreParkingOff' 'X3D CPU: this tweak is refused on purpose, Windows parks cores to keep games on the V-Cache die' $false }
     if ($b -and $b.Tier -in 'low', 'entry') {
