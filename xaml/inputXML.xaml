@@ -632,7 +632,7 @@
                 <TextBlock Text="FPS doctor: what is capping your frame rate" Style="{StaticResource SectionHeader}"/>
                 <TextBlock Style="{StaticResource Dim}" TextWrapping="Wrap" Text="Past the safe preset, Windows tweaks stop adding frames. What is left is usually outside Windows: a frame cap, the wrong renderer, memory without XMP or on one channel, the monitor in the motherboard port, the wrong GPU, a laptop on battery. This reads all of it and changes nothing."/>
                 <StackPanel Orientation="Horizontal" Margin="8,6,0,4">
-                  <Button Name="BtnFpsDoctor" Content="Check what limits my FPS" Style="{StaticResource AccentButton}" ToolTip="Read-only. Reads Fortnite's frame cap, renderer, VSync and ray tracing from GameUserSettings.ini, memory speed, rated speed and channels, which GPU drives the monitor, the GPU's PCIe link, the refresh rate, battery and power plan, and which GPU Fortnite is assigned to. Each finding says where to fix it. Nothing is written."/>
+                  <Button Name="BtnFpsDoctor" Content="Check what limits my FPS" Style="{StaticResource AccentButton}" ToolTip="Read-only. Reads Fortnite's frame cap, renderer, VSync and ray tracing from GameUserSettings.ini, memory speed, rated speed and channels, which GPU drives the monitor, the GPU's PCIe link, the refresh rate, battery and power plan, which GPU Fortnite is assigned to, and for edit delay Wi-Fi, packet loss, jitter and ping to your closest Fortnite region. Each finding says where to fix it. Nothing is written."/>
                 </StackPanel>
                 <StackPanel Name="FpsDoctorPanel"/>
                 <TextBlock Text="This PC" Style="{StaticResource SectionHeader}"/>

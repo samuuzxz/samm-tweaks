@@ -313,6 +313,7 @@ $base = [ordered]@{
     FnInstalled = $true; FnIniExists = $true; FnFrameRateLimit = 0.0; FnVSync = 'False'; FnFullscreenMode = '0'
     FnRHI = 'dx12'; FnFeatureLevel = 'es31'; FnRayTracing = 'False'; FnNanite = 'False'
     FnReflex = '2'; FnMeshQuality = '0'; FnViewDistance = '0'; FnShadows = '0'; FnEffects = '0'
+    IsWiFi = $false; Region = 'Europe'; RegionMs = 18.0; RegionJitterMs = 1.2; RegionLossPct = 0.0
     FnExe = 'C:\Fortnite\FortniteGame\Binaries\Win64\FortniteClient-Win64-Shipping.exe'; FnGpuPreference = ''; FnOnHdd = $false
 }
 $doc = { param($Changes) $h = [ordered]@{}; foreach ($k in $base.Keys) { $h[$k] = $base[$k] }; foreach ($k in $Changes.Keys) { $h[$k] = $Changes[$k] }; @(Get-UTFpsDoctorFindings -Facts ([pscustomobject]$h)) }
@@ -335,6 +336,13 @@ Assert (& $has (& $doc @{ FnReflex = '0' }) 'fix' 'Reflex is off') 'Reflex off i
 Assert (& $has (& $doc @{ FnReflex = '1' }) 'fix' 'not On \+ Boost') 'Reflex On without Boost is named'
 Assert (-not (& $has (& $doc @{ FnReflex = '' }) 'fix' 'Reflex')) 'no Reflex claim when the key is absent (AMD, Intel)'
 Assert (-not (& $has (& $doc @{ FnReflex = '0'; Gpus = @([pscustomobject]@{ Name = 'AMD Radeon RX 7800 XT'; Kind = 'discrete'; DrivesDisplay = $true; PnpId = 'x' }) }) 'fix' 'Reflex')) 'no Reflex claim on an AMD card, which cannot turn it on'
+Assert (& $has (& $doc @{ IsWiFi = $true }) 'fix' 'Wi-Fi') 'Wi-Fi is an edit fix'
+Assert (& $has (& $doc @{ RegionLossPct = 17.0 }) 'fix' 'packet loss to Europe') 'packet loss to the best region is an edit fix'
+Assert (& $has (& $doc @{ RegionJitterMs = 9.0 }) 'warn' 'Jitter 9 ms') 'high jitter is an edit check'
+Assert (& $has (& $doc @{ RegionMs = 72.0 }) 'warn' '72 ms to Europe') 'a far region is named with its ping'
+Assert (& $has $clean 'ok' '18 ms to Europe') 'a good connection is listed as passed'
+Assert (& $has (& $doc @{ RegionMs = $null; RegionJitterMs = $null; RegionLossPct = $null }) 'info' 'not measured') 'an unmeasured region is said, not guessed'
+Assert (& $has $clean 'info' 'Edit settings') 'the in-game edit settings are pointed at when Fortnite is installed'
 Assert (& $has (& $doc @{ DimmCount = 1; DimmChannels = @('A') }) 'fix' 'single channel') 'one stick on a desktop is a fix'
 Assert (& $has (& $doc @{ DimmCount = 1; DimmChannels = @('A'); IsLaptop = $true }) 'warn' 'single channel') 'one stick on a laptop is only a check'
 Assert (& $has (& $doc @{ DimmChannels = @('A', 'A') }) 'fix' 'channel A') 'two sticks in the same channel is a fix'

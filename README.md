@@ -65,6 +65,9 @@ cannot reach, so the doctor reads those places and changes nothing:
 - GPU: a GPU with no driver, the monitor cable in the motherboard instead of the graphics card,
   the GPU running on fewer PCIe lanes than it supports, and which GPU Fortnite is assigned to on a
   two-GPU PC.
+- Edit delay: Wi-Fi, packet loss, jitter and ping to your closest Fortnite region (edits are
+  confirmed by the server, so the connection sets how fast they land and whether they stick), plus
+  the in-game edit settings to check, which live in your Epic account and cannot be read from the PC.
 - The monitor left at 60 Hz, a laptop on battery, the Power saver plan, Fortnite on a hard disk.
 
 Each finding says where to fix it, worst first, with the impact in words: the size of a gain

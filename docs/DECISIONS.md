@@ -911,6 +911,18 @@ empty rather than producing a claim.
 Impact is given in words (large, medium, "in fights", "stutter"), never as a percentage. How much
 each item is worth depends on how CPU-bound the machine is, so a number would be invented.
 
+### Edit delay
+
+A follow-up clarified "zero delay" as delay when editing. An edit is confirmed by the server, so how
+quickly it lands and whether it sticks depends first on the connection, and only after that on frame
+time. The doctor reuses the region measurement that runs at start-up rather than pinging again. It
+reports the closest Epic region and flags packet loss above 0 (an edit the server never saw), jitter
+above 5 ms (the same threshold as the NETWORK tab) and a round trip of 50 ms or more, plus Wi-Fi from
+the default-route adapter. The distance part is stated plainly: no PC setting lowers it. The in-game
+edit options (Confirm Edit on Release, Turbo Building, the edit bind) are saved to the Epic account,
+not to GameUserSettings.ini, so they are named for the player to check and are never read or
+written.
+
 ### `UTFortniteGpuPref` (optional tier)
 
 `HKCU\Software\Microsoft\DirectX\UserGpuPreferences`, value named after the full path of

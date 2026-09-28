@@ -69,6 +69,7 @@ function Get-UTFpsDoctorFacts {
         FnRHI = ''; FnFeatureLevel = ''; FnRayTracing = ''; FnNanite = ''
         FnReflex = ''; FnMeshQuality = ''; FnViewDistance = ''; FnShadows = ''; FnEffects = ''
         FnExe = ''; FnGpuPreference = ''; FnOnHdd = $false
+        IsWiFi = $false; Region = ''; RegionMs = $null; RegionJitterMs = $null; RegionLossPct = $null
     }
     $si = $sync.sysinfo
     if ($si) {
@@ -135,6 +136,12 @@ function Get-UTFpsDoctorFacts {
         # The GUID, not the name: plan names are translated on non-English Windows.
         if ($scheme -match 'a1841308-3541-4fab-bc81-f71556f20b4a') { $f.PowerSaver = $true }
     } catch { }
+
+    try { $f.IsWiFi = [bool](Get-UTNetworkLink).IsWiFi } catch { }
+    # The region measurement runs in the background at start-up; the doctor reuses it rather than
+    # pinging again, and says so when it has not finished.
+    $best = @($sync.regions | Where-Object { $_ -and $_.Host -like '*epicgames.com' -and $null -ne $_.AvgMs }) | Select-Object -First 1
+    if ($best) { $f.Region = [string]$best.Region; $f.RegionMs = [double]$best.AvgMs; $f.RegionJitterMs = [double]$best.JitterMs; $f.RegionLossPct = [double]$best.LossPct }
 
     try {
         $fn = Get-UTFortnite
@@ -260,6 +267,33 @@ function Get-UTFpsDoctorFindings {
     }
     if ($f.FnFullscreenMode -eq '2') {
         & $add 'warn' 'Fortnite' 'Fortnite runs in a window' 'Windowed mode is composed by the desktop window manager, which costs frames and latency.' 'Video menu: Window Mode = Fullscreen, or any profile in the FORTNITE tab.' 'small'
+    }
+
+    # --- Edits: an edit is confirmed by the server, so how fast it lands and whether it sticks is set by
+    # the connection, then by frame time. No PC setting shortens the distance to the server.
+    if ($f.IsWiFi) {
+        & $add 'fix' 'Edits' 'You are on Wi-Fi' 'Wi-Fi adds jitter and short loss bursts. Edits and builds wait on the server, so they are the first thing to land late, fail or snap back in a fight.' 'Use an Ethernet cable. If that is impossible, 5 GHz close to the router is the next best thing.' 'large for edits'
+    }
+    if ($null -ne $f.RegionMs) {
+        $bad = $false
+        if ($f.RegionLossPct -gt 0) {
+            $bad = $true
+            & $add 'fix' 'Edits' ("{0} percent packet loss to {1}" -f $f.RegionLossPct, $f.Region) 'A lost packet is an edit the server never saw: this is the usual cause of edits that do not go through or reset.' 'NETWORK tab: run the region test again on a cable. If loss stays, it is the router or the provider: restart the router, then call the provider with the traceroute from that tab.' 'large for edits'
+        }
+        if ($f.RegionJitterMs -gt 5) {
+            $bad = $true
+            & $add 'warn' 'Edits' ("Jitter {0} ms to {1}" -f $f.RegionJitterMs, $f.Region) 'Jitter makes the edit delay change from one edit to the next, so muscle memory never lines up.' 'Cable instead of Wi-Fi, and nothing downloading or streaming on the same connection while you play.' 'medium for edits'
+        }
+        if ($f.RegionMs -ge 50) {
+            $bad = $true
+            & $add 'warn' 'Edits' ("{0} ms to {1}, your closest Fortnite region" -f $f.RegionMs, $f.Region) ("Each edit is confirmed about one round trip later, so roughly {0} ms rides on every edit. That is distance to the datacenter: no tweak and no PC setting lowers it." -f $f.RegionMs) 'Make sure matchmaking uses this region (Settings > Game > Matchmaking Region). A cable and a closer server are the only real fixes.' 'edit delay'
+        }
+        if (-not $bad) { & $add 'ok' 'Edits' ("{0} ms to {1}, no loss, low jitter" -f $f.RegionMs, $f.Region) '' '' '' }
+    } else {
+        & $add 'info' 'Edits' 'Region ping not measured yet' 'The edit checks reuse the region test that runs in the background at start-up.' 'Wait for it, or press the region test in the NETWORK tab, then run the doctor again.' ''
+    }
+    if ($f.FnInstalled) {
+        & $add 'info' 'Edits' 'Edit settings to check in game' 'Fortnite keeps these in your Epic account, not on this PC, so they cannot be read or written from here.' 'Settings > Game: Confirm Edit on Release ON (an edit lands the moment you let go of fire, one press less), Turbo Building ON. Put Edit on a key or mouse button you can hit without moving your WASD hand. A mouse at 1000 Hz polling or more.' 'faster edits'
     }
 
     # --- Memory: the biggest hardware lever in a CPU-bound game, and invisible from inside Windows.
