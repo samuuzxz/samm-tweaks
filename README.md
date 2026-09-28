@@ -5,7 +5,7 @@ clean dark interface, live CPU / RAM / GPU / disk / network graphs on the left, 
 have a documented mechanism. Everything is reversible. Nothing is paywalled, nothing is hidden.
 
 ```powershell
-irm https://raw.githubusercontent.com/unknownaimer/unknownutility/main/unknowntweaks.ps1 | iex
+irm https://raw.githubusercontent.com/samuuzxz/samm-tweaks/main/unknowntweaks.ps1 | iex
 ```
 
 Open PowerShell (no admin needed, it asks for elevation itself), paste, press Enter.
