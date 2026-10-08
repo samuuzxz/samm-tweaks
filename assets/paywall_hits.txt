@@ -1,1 +1,56 @@
-python: can't open file 'C:\\Users\\samuu\\Documents\\samm-tweaks\\find_paywall.py': [Errno 2] No such file or directory
+Loaded 4635136
+[donation_cache] 0x00218c68:
+  func....file.... line=.../.shift........8.!@....H.!@....X.!@....h.!@....settings.json...swaps.json......presets.json....donation_cache.txt........!@......!@....Backups.logs....Shift...ItemChanger.fr..:/data/data/items_fr.json.......:/data/data/items_en.j
+
+[donation] 0x00218c68:
+  func....file.... line=.../.shift........8.!@....H.!@....X.!@....h.!@....settings.json...swaps.json......presets.json....donation_cache.txt........!@......!@....Backups.logs....Shift...ItemChanger.fr..:/data/data/items_fr.json.......:/data/data/item
+
+[donation] 0x00225053:
+  n copi...............Impossible de charger le lien de don. V..rifiez votre connexion.................Could not load the donation link. Check your internet connection........Le lien de don n'est pas encore configur........The donation link is not co
+
+[donation] 0x002250bc:
+  d not load the donation link. Check your internet connection........Le lien de don n'est pas encore configur........The donation link is not configured yet.........V..rification Discord...Discord verification............V..rification de votre adh..
+
+[donation] 0x0023ab6f:
+  .}...............................Sidebar.categorySelected..shift::catalog::Category.c.activeSwapsClicked.presetsClicked.donationClicked.updatesClicked...................................................................,......................./......
+
+[tier] 0x0022f3e4:
+  -site.......sec-fetch-site..cors....sec-fetch-mode..empty...sec-fetch-dest..[psynet] skills fetch failed: ..skills..mmr.tier........division........rankName........divisionName....matchesPlayed...[tracker] post-match MMR poll satisfied (matches
+
+[tier] 0x003b6507:
+  .Division I......Division II.....Division III....Division IV.....segments....type......../attributes/playlistId../stats/tier/metadata/name......./stats/division/metadata/name.../stats/rating/value...../stats/wins/value......./stats/matchesPlaye
+
+[Tier] 0x0022069e:
+  ..Extended camera settings........Custom team colors......Fixed or random displayed ping..DonationCard....Lite....UpsellTierName..UpsellFeature...UpsellCheck.....UpsellFeatureMuted......UpsellCross.....Get Lite........UpsellCardPlus..Plus....Up
+
+[Tier] 0x0022071e:
+  ..UpsellFeature...UpsellCheck.....UpsellFeatureMuted......UpsellCross.....Get Lite........UpsellCardPlus..Plus....UpsellTierNamePlus......RECOMMENDED.....UpsellBadge.....PLUS EXCLUSIVES.UpsellDivider...UpsellCheckPlus.Get Plus........Cosmetic c
+
+[unlocked] 0x00223014:
+   with Shift. Grab a key in our Discord......L'essentiel.....The essentials..Toutes les fonctionnalit..s.....Everything, unlocked....RECOMMAND.......EXCLUSIVIT..S PLUS......Obtenir Lite....Obtenir Plus....Tarifs et licences disponibles sur Discord..
+
+[Everything, unlocked] 0x00223008:
+  ocket League with Shift. Grab a key in our Discord......L'essentiel.....The essentials..Toutes les fonctionnalit..s.....Everything, unlocked....RECOMMAND.......EXCLUSIVIT..S PLUS......Obtenir Lite....Obtenir Plus....Tarifs et licences disponibles sur Discord..
+
+[owned] 0x002299a1:
+  u own first (the one that will be modified), then pick the item whose visual you want it to display. Once applied, your owned item renders as the chosen visual in-game.</p><p><b>To get a painted item:</b> swap to the item you want, then use the 
+
+[owned] 0x00229b9f:
+  If it fails, try swapping <b>another item you own</b> to the same visual. The visual you want may work with a different owned item. Same idea for bodies, boosts, wheels and trails.</li><li><b>Octane / Fennec paint</b> (and potentially a few othe
+
+[discord_id] 0x00235752:
+  ..l.._;...'..@u...6...u...m..L5......A9.~.....).!.7..F)......W=...5..Lw.5.-..W+.<.....4...4...p_hwid..p_version.......p_discord_id....p_discord_username......p_hwid_legacy...Content-Type....discord_cache.json..ts..p.<@.......@.......@......<@.......@
+
+[p_discord_id] 0x00235750:
+  8...l.._;...'..@u...6...u...m..L5......A9.~.....).!.7..F)......W=...5..Lw.5.-..W+.<.....4...4...p_hwid..p_version.......p_discord_id....p_discord_username......p_hwid_legacy...Content-Type....discord_cache.json..ts..p.<@.......@.......@......<@.......@
+
+[/tier] 0x003b6506:
+  ..Division I......Division II.....Division III....Division IV.....segments....type......../attributes/playlistId../stats/tier/metadata/name......./stats/division/metadata/name.../stats/rating/value...../stats/wins/value......./stats/matchesPlaye
+
+[bridge-server] 0x0022e96e:
+  ..p..@.....T.@.....T.@.....T.@.....T.@.....T.@.....T.@.....T.@..../tracker.ini....SHIFT_BRIDGE_URL........https://shift-bridge-server.onrender.com......../api/skills...../My Games/Rocket League/TAGame/Logs/Launch.log..PlayerID=([A-Za-z0-9]+\|[A-Za-z0-9_
+
+[shift-bridge] 0x0022e968:
+  `%.@....p..@.....T.@.....T.@.....T.@.....T.@.....T.@.....T.@.....T.@..../tracker.ini....SHIFT_BRIDGE_URL........https://shift-bridge-server.onrender.com......../api/skills...../My Games/Rocket League/TAGame/Logs/Launch.log..PlayerID=([A-Za-z0-9]+\|[A-Z
+
+  QSET: UsKCb7f4XuXScHDg97OWndmyUu83Hx/54
