@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "bodies": {
+    "23":   { "label": "Octane",    "token": "Octane",
+              "bodyUpk": "Startup.upk",
+              "bodyTextures": {
+                "Diffuse":        "Pepe_Body_D",
+                "Skin":           "Pepe_Body_BlankSkin",
+                "CurvaturePack":  "Body_Octane_Curvature_New",
+                "Chassis.Diffuse": "Chasis_Pepe_D"
+              } },
+    "4284": { "label": "Fennec",    "token": "Grain" },
+    "3":    { "label": "Dominus",   "token": "MuscleCar" }
+  },
+  "roles": {
+    "Huntress_Map": [
+      { "upkPattern": "skin_*_huntress",
+        "texture": "Body_<Body>_SE_M",
+        "format": "PF_DXT5" }
+    ],
+    "Skin": [
+      { "upkPattern": "skin_*_mono_a",
+        "texture": "<Body>_Mono_a_Body_Paintable_Mat_BaseColor",
+        "format": "PF_A8R8G8B8" },
+      { "upkPattern": "body_*",
+        "texture": "Body_<Token>_BlankSkin",
+        "format": "PF_DXT5" }
+    ],
+    "1_Diffuse_Skin": [
+      { "upkPattern": "skin_*_complexity_*",
+        "texture": "skin_<token>_complexity_home",
+        "format": "PF_DXT1" },
+      { "upkPattern": "skin_autofuria_*",
+        "texture": "T_AutoFuria_00_BG",
+        "format": "PF_DXT1" },
+      { "upkPattern": "skin_*_bds_home",
+        "texture": "skin_<token>_BDS_home_D",
+        "format": "PF_DXT1" }
+    ],
+    "2_Diffuse_Skin_Mask": [
+      { "upkPattern": "skin_*_complexity_*",
+        "texture": "skin_<token>_complexity_Home_RGB",
+        "format": "PF_DXT1" },
+      { "upkPattern": "skin_*_bds_home",
+        "texture": "skin_<token>_BDS_home_RGB",
+        "format": "PF_DXT1" }
+    ],
+    "TrimSheet": [
+      { "upkPattern": "skin_autofuria_*",
+        "texture": "T_AutoFuria_00_Logo",
+        "format": "PF_DXT5" }
+    ],
+
+    "Diffuse": [
+      { "upkPattern": "body_*",
+        "texture": "Body_<Token>_D",
+        "format": "PF_DXT5" }
+    ],
+    "CurvaturePack": [
+      { "upkPattern": "body_*",
+        "texture": "Body_<Token>_Curvature",
+        "format": "PF_DXT5" }
+    ],
+    "BodyMasks": [
+      { "upkPattern": "body_*",
+        "texture": "Body_<Token>_FXMasks",
+        "format": "PF_A8R8G8B8" }
+    ],
+    "Normal": [
+      { "upkPattern": "body_*",
+        "texture": "Body_<Token>_BodyNormalMap",
+        "format": "PF_DXT5" }
+    ],
+    "Chassis.Diffuse": [
+      { "upkPattern": "body_*",
+        "texture": "Chassis_<Token>_D",
+        "format": "PF_DXT1" }
+    ]
+  }
+}
