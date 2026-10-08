@@ -1,0 +1,18 @@
+2026-10-08T15:54:42Z  === launch ===
+2026-10-08T15:54:42Z  step: QApplication ctor
+2026-10-08T15:54:42Z  step: migrateFromItemChangerAppData
+2026-10-08T15:54:42Z  step: migrateLegacyAppDataLayout
+2026-10-08T15:54:42Z  step: migrateFromLegacyAppData
+2026-10-08T15:54:42Z  step: pre-read settings + applyTheme
+2026-10-08T15:54:42Z  step: register AES keys
+2026-10-08T15:54:42Z    keys.txt: 48252 bytes read, 1048 new keys added
+2026-10-08T15:54:42Z  step: register per-package keys from products.csv
+2026-10-08T15:54:42Z    products.csv: 1390948 bytes read, 27 new keys added, 9434 package-map entries added
+2026-10-08T15:54:42Z  step: loadSettings
+2026-10-08T15:54:43Z  step: runUpdateCheck
+2026-10-08T15:54:43Z  step: extractItemsJsonIfMissing
+2026-10-08T15:54:43Z  step: ItemsDb::loadFromFile
+2026-10-08T15:54:43Z    items_db: 8746 entries loaded
+2026-10-08T15:54:43Z  step: construct MainWindow
+2026-10-08T15:54:43Z  step: OnboardingDialog ctor (first run)
+2026-10-08T15:54:43Z  step: OnboardingDialog::exec
